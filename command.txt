@@ -1,0 +1,28 @@
+yum update
+yum -y install wget patch git
+wget https://bootstrap.pypa.io/ez_setup.py -O - | python
+easy_install Sphinx==1.1.3
+cd /tmp
+wget https://bitbucket.org/sphinxjp/website/downloads/uchida-sphinxjp-japanese-latex.patch -O /tmp/
+cd /usr/lib/python2.6/site-packages/Sphinx-1.1.3-py2.6.egg
+patch -p1 < /tmp/uchida-sphinxjp-japanese-latex.patch
+# tex
+wget http://mirror.ctan.org/systems/texlive/Images/texlive2014.iso
+mkdir texlive2014
+mount -o loop -t iso9660 texlive2014.iso texlive2014
+cd texlive2014
+./install-tl -profile tlpkg/texlive.tlpdb
+echo "PATH=$PATH:/usr/local/texlive/2014/bin/x86_64-linux/" > /etc/profile.d/texlive.sh
+chmod +x /etc/profile.d/texlive.sh
+
+yum install python-setuptools python-imaging ipa-gothic-fonts gcc python-devel
+easy_install sphinxcontrib-blockdiag
+
+useradd build
+su - build
+git clone https://github.com/nanaka-inside/C86.git
+cd C86
+make latexpdfja
+cd /home/build/C86/_build/latex
+python -m SimpleHTTPServer 8000
+# アクセスしてpdfを確認。画像が入ってない。フォントが違うので直す
